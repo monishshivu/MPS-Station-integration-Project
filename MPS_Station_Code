@@ -1,0 +1,650 @@
+# MPS-Station-integration-Project
+Integrating 3 MPS station using one Plc S71500 and IO_LINK
+Main Program
+
+/// all stations working  //////
+/// Green light integrated in all stations//
+/// Red light integrated in seg 1...no workpiece in slider in station 1///
+///Looping sucessfully integrated///
+//Blue light for Slide full sensor integrated(detects all teh slides together)///
+//Orange blink in station 1 and 2 for comms btwn stn1 and stn 2///
+//Orange blink in station 3 and 2 for comms btwn stn3 and stn 2
+IF "Reset" THEN
+    "CP_Conveyor" := 0;
+    "S_Conveyor" := 0;
+    "WP_Vaccum _Off" := 0;
+    "WP_Vaccum _On" := 0;
+    "CP_Vaccum_ON" := 0;
+END_IF;
+
+IF NOT "Stop" THEN //Reset Mechanism
+    "Start_light" := 0;
+    "WP_Slider_Extend" := 0;
+    "WP_Hand_Ret" := 0;
+    "WP_Hand_Ext" := 1;
+    "WP_Vaccum _Off" := 0;
+    "WP_Vaccum _On" := 0;
+    "CP_Conveyor" := 0;
+    "CP_Z_Movement_ON" := 0;
+    "CP_X_Movement_Ext" := 0;
+    "CP_Vaccum_ON" := 0;
+    "S_Conveyor" := 0;
+    "S_WP_stopper" := 0;
+    "S_Sep_1" := 0;
+    "S_sep_2" := 0;
+    #Step := 1;
+END_IF;
+CASE #Step OF
+    1: // 
+        
+        "WP_Hand_Ext" := 1;
+        "WP_Slider_Extend" := 0;
+        "CP_Conveyor" := 0;
+        "CP_X_Movement_Ext" := 0;
+        "CP_X_Movement_Ret" := 1;
+        "CP_Z_Movement_ON" := 0;
+        "S_Conveyor" := 0;
+        "Start" := 0;
+        #Step := 2;
+        "S2_transmitter" := 1;
+        "S3_Comm_Transmitter" := 1;
+        
+        ;
+        
+    2: //all segement Green
+        "seg1_1" := 1;
+        "seg1_2" := 0;
+        "seg1_3" := 0;
+        "seg1_blink" := 0;
+        "seg2_1" := 1;
+        "seg2_2" := 0;
+        "seg2_3" := 0;
+        "seg2_blink" := 0;
+        "seg3_1" := 1;
+        "seg3_2" := 0;
+        "seg3_3" := 0;
+        "seg3_blink" := 0;
+        "seg4_1" := 0;
+        "seg4_2" := 0;
+        "seg4_3" := 0;
+        "seg4_blink" := 0;
+        "seg5_1" := 0;
+        "seg5_2" := 0;
+        "seg5_3" := 0;
+        "seg5_blink" := 0;
+        "buzzer_type1" := 0;
+        "buzzer_type2" := 0;
+        "buzzer_state" := 0;
+        "Segment_mode" := 1;
+        "level_mode" := 0;
+        "runlight_mode" := 0;
+        "flexible_mode" := 0;
+        "sync_start" := 0;
+        "sync_impulse" := 0;
+        "No_of_segments" := 3;
+        "blink_seg1" := 0;
+        "blink_seg2" := 0;
+        "blink_seg3" := 0;
+        "blink_seg4" := 0;
+        "blink_seg5" := 0;
+        "blinking_freequency" := 5;
+        "buzzer_volume" := 255;
+        // End of all green
+        
+        IF "Start" THEN
+            IF NOT "S2_S3_Com_receiver" THEN
+                IF NOT "S1_S2_COM" THEN
+                    "Start_light" := 1;
+                    
+                    // all segement off
+                    "seg1_1" := 0;
+                    "seg1_2" := 0;
+                    "seg1_3" := 0;
+                    "seg1_blink" := 0;
+                    "seg2_1" := 0;
+                    "seg2_2" := 0;
+                    "seg2_3" := 0;
+                    "seg2_blink" := 0;
+                    "seg3_1" := 0;
+                    "seg3_2" := 0;
+                    "seg3_3" := 0;
+                    "seg3_blink" := 0;
+                    "seg4_1" := 0;
+                    "seg4_2" := 0;
+                    "seg4_3" := 0;
+                    "seg4_blink" := 0;
+                    "seg5_1" := 0;
+                    "seg5_2" := 0;
+                    "seg5_3" := 0;
+                    "seg5_blink" := 0;
+                    "buzzer_type1" := 0;
+                    "buzzer_type2" := 0;
+                    "buzzer_state" := 0;
+                    "Segment_mode" := 1;
+                    "level_mode" := 0;
+                    "runlight_mode" := 0;
+                    "flexible_mode" := 0;
+                    "sync_start" := 0;
+                    "sync_impulse" := 0;
+                    "No_of_segments" := 3;
+                    "blink_seg1" := 0;
+                    "blink_seg2" := 0;
+                    "blink_seg3" := 0;
+                    "blink_seg4" := 0;
+                    "blink_seg5" := 0;
+                    "blinking_freequency" := 5;
+                    "buzzer_volume" := 255;
+                    //end of all seg off//
+                    #Step := 3;
+                ELSE
+                    //segment1-2 orange blink for no communication btwn s1 and s2
+                    "seg1_1" := 1;
+                    "seg1_2" := 0;
+                    "seg1_3" := 1;
+                    "seg1_blink" := 1;
+                    "seg2_1" := 1;
+                    "seg2_2" := 0;
+                    "seg2_3" := 1;
+                    "seg2_blink" := 1;
+                    "seg3_1" := 0;
+                    "seg3_2" := 0;
+                    "seg3_3" := 0;
+                    "seg3_blink" := 0;
+                    "seg4_1" := 0;
+                    "seg4_2" := 0;
+                    "seg4_3" := 0;
+                    "seg4_blink" := 0;
+                    "seg5_1" := 0;
+                    "seg5_2" := 0;
+                    "seg5_3" := 0;
+                    "seg5_blink" := 0;
+                    "buzzer_type1" := 0;
+                    "buzzer_type2" := 0;
+                    "buzzer_state" := 0;
+                    "Segment_mode" := 1;
+                    "level_mode" := 0;
+                    "runlight_mode" := 0;
+                    "flexible_mode" := 0;
+                    "sync_start" := 0;
+                    "sync_impulse" := 0;
+                    "No_of_segments" := 3;
+                    "blink_seg1" := 0;
+                    "blink_seg2" := 0;
+                    "blink_seg3" := 0;
+                    "blink_seg4" := 0;
+                    "blink_seg5" := 0;
+                    "blinking_freequency" := 5;
+                    "buzzer_volume" := 255;
+                    //end of seg 1-2 orange blink//
+                END_IF;
+            ELSE
+                //segment2-3 orange blink for no communication btwn s1 and s2
+                "seg1_1" := 0;
+                "seg1_2" := 0;
+                "seg1_3" := 0;
+                "seg1_blink" := 0;
+                "seg2_1" := 1;
+                "seg2_2" := 0;
+                "seg2_3" := 1;
+                "seg2_blink" := 1;
+                "seg3_1" := 1;
+                "seg3_2" := 0;
+                "seg3_3" := 1;
+                "seg3_blink" := 1;
+                "seg4_1" := 0;
+                "seg4_2" := 0;
+                "seg4_3" := 0;
+                "seg4_blink" := 0;
+                "seg5_1" := 0;
+                "seg5_2" := 0;
+                "seg5_3" := 0;
+                "seg5_blink" := 0;
+                "buzzer_type1" := 0;
+                "buzzer_type2" := 0;
+                "buzzer_state" := 0;
+                "Segment_mode" := 1;
+                "level_mode" := 0;
+                "runlight_mode" := 0;
+                "flexible_mode" := 0;
+                "sync_start" := 0;
+                "sync_impulse" := 0;
+                "No_of_segments" := 3;
+                "blink_seg1" := 0;
+                "blink_seg2" := 0;
+                "blink_seg3" := 0;
+                "blink_seg4" := 0;
+                "blink_seg5" := 0;
+                "blinking_freequency" := 5;
+                "buzzer_volume" := 255;
+                //end of seg 2-3 orange blink
+            END_IF;
+        END_IF;
+    3:
+        IF NOT "WP_Sensor_ON" THEN
+            //
+            "WP_Hand_Ext" := 1;
+            "WP_Slider_Extend" := 0;
+            "CP_Conveyor" := 0;
+            "CP_X_Movement_Ext" := 0;
+            "CP_X_Movement_Ret" := 1;
+            "CP_Z_Movement_ON" := 0;
+            //
+            "WP_Slider_Extend" := 1;
+            "WP_Vaccum _On" := 1;
+            "WP_Hand_Ext" := 0;
+            "WP_Hand_Ret" := 1;
+            #Step := 4;
+        ELSE
+            //segment1 red for non availablity of workpiece
+            "seg1_1" := 0;
+            "seg1_2" := 1;
+            "seg1_3" := 0;
+            "seg1_blink" := 0;
+            "seg2_1" := 0;
+            "seg2_2" := 0;
+            "seg2_3" := 0;
+            "seg2_blink" := 0;
+            "seg3_1" := 0;
+            "seg3_2" := 0;
+            "seg3_3" := 0;
+            "seg3_blink" := 0;
+            "seg4_1" := 0;
+            "seg4_2" := 0;
+            "seg4_3" := 0;
+            "seg4_blink" := 0;
+            "seg5_1" := 0;
+            "seg5_2" := 0;
+            "seg5_3" := 0;
+            "seg5_blink" := 0;
+            "buzzer_type1" := 0;
+            "buzzer_type2" := 0;
+            "buzzer_state" := 1;
+            "Segment_mode" := 1;
+            "level_mode" := 0;
+            "runlight_mode" := 0;
+            "flexible_mode" := 0;
+            "sync_start" := 0;
+            "sync_impulse" := 0;
+            "No_of_segments" := 1;
+            "blink_seg1" := 0;
+            "blink_seg2" := 0;
+            "blink_seg3" := 0;
+            "blink_seg4" := 0;
+            "blink_seg5" := 0;
+            "blinking_freequency" := 1;
+            "buzzer_volume" := 255;
+            ////End of seg 1 red
+            #Step := 3;
+            
+        END_IF;
+        
+        ;
+        
+    4:
+        IF "WP_Hand_Ret_Sensor" THEN
+            
+            // segment1 Green
+            "seg1_1" := 1;
+            "seg1_2" := 0;
+            "seg1_3" := 0;///
+            "seg1_blink" := 0;
+            "seg2_1" := 0;
+            "seg2_2" := 0;
+            "seg2_3" := 0;
+            "seg2_blink" := 0;
+            "seg3_1" := 0;
+            "seg3_2" := 0;
+            "seg3_3" := 0;
+            "seg3_blink" := 0;
+            "seg4_1" := 0;
+            "seg4_2" := 0;
+            "seg4_3" := 0;
+            "seg4_blink" := 0;
+            "seg5_1" := 0;
+            "seg5_2" := 0;
+            "seg5_3" := 0;
+            "seg5_blink" := 0;
+            "buzzer_type1" := 0;
+            "buzzer_type2" := 0;
+            "buzzer_state" := 0;
+            "Segment_mode" := 1;
+            "level_mode" := 0;
+            "runlight_mode" := 0;
+            "flexible_mode" := 0;
+            "sync_start" := 0;
+            "sync_impulse" := 0;
+            "No_of_segments" := 3;
+            "blink_seg1" := 0;
+            "blink_seg2" := 0;
+            "blink_seg3" := 0;
+            "blink_seg4" := 0;
+            "blink_seg5" := 0;
+            "blinking_freequency" := 5;
+            "buzzer_volume" := 255;
+            //End of segment1 green
+            
+            
+            "WP_Slider_Extend" := 0;
+            "WP_Hand_Ret" := 0;
+            "WP_Hand_Ext" := 1;
+            #Step := 5;
+        END_IF
+        ;
+    5:
+        IF "WP_Hand_Ext_Sensor" THEN
+            "WP_Vaccum _On" := 0;
+            "WP_Vaccum _Off" := 1;
+            "WP_Hand_Ext" := 0;
+            "WP_Hand_Ret" := 1;
+            #Step := 6;
+            
+        END_IF
+        ;
+    6:
+        IF "CP_WP_Entry_Sensor" AND "WP_Hand_Ret_Sensor" THEN
+            //segment1_off
+            "seg1_1" := 0;
+            "seg1_2" := 0;
+            "seg1_3" := 0;
+            "seg1_blink" := 0;
+            "seg2_1" := 0;
+            "seg2_2" := 0;
+            "seg2_3" := 0;
+            "seg2_blink" := 0;
+            "seg3_1" := 0;
+            "seg3_2" := 0;
+            "seg3_3" := 0;
+            "seg3_blink" := 0;
+            "seg4_1" := 0;
+            "seg4_2" := 0;
+            "seg4_3" := 0;
+            "seg4_blink" := 0;
+            "seg5_1" := 0;
+            "seg5_2" := 0;
+            "seg5_3" := 0;
+            "seg5_blink" := 0;
+            "buzzer_type1" := 0;
+            "buzzer_type2" := 0;
+            "buzzer_state" := 0;
+            "Segment_mode" := 1;
+            "level_mode" := 0;
+            "runlight_mode" := 0;
+            "flexible_mode" := 0;
+            "sync_start" := 0;
+            "sync_impulse" := 0;
+            "No_of_segments" := 3;
+            "blink_seg1" := 0;
+            "blink_seg2" := 0;
+            "blink_seg3" := 0;
+            "blink_seg4" := 0;
+            "blink_seg5" := 0;
+            "blinking_freequency" := 5;
+            "buzzer_volume" := 255;
+            
+            //segment2 green
+            
+            "seg1_1" := 0;
+            "seg1_2" := 0;
+            "seg1_3" := 0;
+            "seg1_blink" := 0;
+            "seg2_1" := 1;
+            "seg2_2" := 0;
+            "seg2_3" := 0;
+            "seg2_blink" := 0;
+            "seg3_1" := 0;
+            "seg3_2" := 0;
+            "seg3_3" := 0;
+            "seg3_blink" := 0;
+            "seg4_1" := 0;
+            "seg4_2" := 0;
+            "seg4_3" := 0;
+            "seg4_blink" := 0;
+            "seg5_1" := 0;
+            "seg5_2" := 0;
+            "seg5_3" := 0;
+            "seg5_blink" := 0;
+            "buzzer_type1" := 0;
+            "buzzer_type2" := 0;
+            "buzzer_state" := 0;
+            "Segment_mode" := 1;
+            "level_mode" := 0;
+            "runlight_mode" := 0;
+            "flexible_mode" := 0;
+            "sync_start" := 0;
+            "sync_impulse" := 0;
+            "No_of_segments" := 3;
+            "blink_seg1" := 0;
+            "blink_seg2" := 0;
+            "blink_seg3" := 0;
+            "blink_seg4" := 0;
+            "blink_seg5" := 0;
+            "blinking_freequency" := 5;
+            "buzzer_volume" := 255;
+            //Sorting station Conveyor reset mechanismm//
+            "S_Conveyor" := 0;
+            //end of conveyor reset
+            //Sorting station separator reset mechanism
+            "S_Sep_1" := 0;
+            "S_sep_2" := 0;
+            // end of sorting mechanism
+            
+            "WP_Vaccum _Off" := 0;
+            "CP_Conveyor" := 1;
+            "CP_Stopper_On" := 1;
+            #Step := 7;
+            
+        END_IF
+        ;
+        
+    7:
+        IF "CP_WP_Stopper_Sensor" THEN
+            "CP_Z_Movement_ON" := 1;
+            "CP_Vaccum_ON" := 1;
+            #Step := 8;
+        END_IF
+        ;
+        ;
+    8:
+        IF "CP_Z_Movement_Sensor" THEN
+            "CP_Z_Movement_ON" := 0;
+            "CP_X_Movement_Ext" := 1;
+            #Step := 9;
+        END_IF;
+    9:
+        IF "CP_X_Movement_Ext_Sensor" THEN
+            "CP_Z_Movement_ON" := 1;
+            #Step := 10;
+        END_IF
+        ;
+        ;
+    10:
+        IF "CP_Z_Movement_Sensor" THEN
+            "CP_Z_Movement_ON" := 0;
+            "CP_Vaccum_ON" := 0;
+            "CP_Stopper_On" := 0;
+            "WP_Hand_Ext" := 1;
+            "WP_Hand_Ret" := 0;
+            #Step := 11;
+            ;
+        END_IF;
+        
+        ;
+        
+    11:
+        IF "S_WP_Entry_sensor" THEN
+            IF NOT "S_slideFull_sensor" THEN
+                //segment2 off
+                "seg1_1" := 0;
+                "seg1_2" := 0;
+                "seg1_3" := 0;
+                "seg1_blink" := 0;
+                "seg2_1" := 0;
+                "seg2_2" := 0;
+                "seg2_3" := 0;
+                "seg2_blink" := 0;
+                "seg3_1" := 0;
+                "seg3_2" := 0;
+                "seg3_3" := 0;
+                "seg3_blink" := 0;
+                "seg4_1" := 0;
+                "seg4_2" := 0;
+                "seg4_3" := 0;
+                "seg4_blink" := 0;
+                "seg5_1" := 0;
+                "seg5_2" := 0;
+                "seg5_3" := 0;
+                "seg5_blink" := 0;
+                "buzzer_type1" := 0;
+                "buzzer_type2" := 0;
+                "buzzer_state" := 0;
+                "Segment_mode" := 1;
+                "level_mode" := 0;
+                "runlight_mode" := 0;
+                "flexible_mode" := 0;
+                "sync_start" := 0;
+                "sync_impulse" := 0;
+                "No_of_segments" := 3;
+                "blink_seg1" := 0;
+                "blink_seg2" := 0;
+                "blink_seg3" := 0;
+                "blink_seg4" := 0;
+                "blink_seg5" := 0;
+                "blinking_freequency" := 5;
+                "buzzer_volume" := 255;
+                
+                //segment3 green
+                "seg1_1" := 0;
+                "seg1_2" := 0;
+                "seg1_3" := 0;
+                "seg1_blink" := 0;
+                "seg2_1" := 0;
+                "seg2_2" := 0;
+                "seg2_3" := 0;
+                "seg2_blink" := 0;
+                "seg3_1" := 1;
+                "seg3_2" := 0;
+                "seg3_3" := 0;
+                "seg3_blink" := 0;
+                "seg4_1" := 0;
+                "seg4_2" := 0;
+                "seg4_3" := 0;
+                "seg4_blink" := 0;
+                "seg5_1" := 0;
+                "seg5_2" := 0;
+                "seg5_3" := 0;
+                "seg5_blink" := 0;
+                "buzzer_type1" := 0;
+                "buzzer_type2" := 0;
+                "buzzer_state" := 0;
+                "Segment_mode" := 1;
+                "level_mode" := 0;
+                "runlight_mode" := 0;
+                "flexible_mode" := 0;
+                "sync_start" := 0;
+                "sync_impulse" := 0;
+                "No_of_segments" := 3;
+                "blink_seg1" := 0;
+                "blink_seg2" := 0;
+                "blink_seg3" := 0;
+                "blink_seg4" := 0;
+                "blink_seg5" := 0;
+                "blinking_freequency" := 5;
+                "buzzer_volume" := 255;
+                
+                "CP_Conveyor" := 0;
+                "S_Conveyor" := 1;
+                "S_WP_stopper" := 0;
+                "TimerOn" := 1;
+                
+                #Step := 12;
+            ELSE
+                //Seg 3 blue for slide full sensor
+                "seg1_1" := 0;
+                "seg1_2" := 0;
+                "seg1_3" := 0;
+                "seg1_blink" := 0;
+                "seg2_1" := 0;
+                "seg2_2" := 0;
+                "seg2_3" := 0;
+                "seg2_blink" := 0;
+                "seg3_1" := 1;
+                "seg3_2" := 1;
+                "seg3_3" := 0;
+                "seg3_blink" := 0;
+                "seg4_1" := 0;
+                "seg4_2" := 0;
+                "seg4_3" := 0;
+                "seg4_blink" := 0;
+                "seg5_1" := 0;
+                "seg5_2" := 0;
+                "seg5_3" := 0;
+                "seg5_blink" := 0;
+                "buzzer_type1" := 0;
+                "buzzer_type2" := 0;
+                "buzzer_state" := 0;
+                "Segment_mode" := 1;
+                "level_mode" := 0;
+                "runlight_mode" := 0;
+                "flexible_mode" := 0;
+                "sync_start" := 0;
+                "sync_impulse" := 0;
+                "No_of_segments" := 3;
+                "blink_seg1" := 0;
+                "blink_seg2" := 0;
+                "blink_seg3" := 0;
+                "blink_seg4" := 0;
+                "blink_seg5" := 0;
+                "blinking_freequency" := 5;
+                "buzzer_volume" := 255;
+                //end of seg3 blue
+                "S_Conveyor" := 0;
+                "CP_Conveyor" := 0;
+                
+                
+                
+            END_IF
+            ;
+        END_IF;
+        
+    12:
+        // Sorting Mechanism //
+        IF "TimerOff" AND "S_Inductive_sensor" AND "S_Red_WP_sensor" THEN
+            "S_WP_stopper" := 1;
+            "TimerOn" := 0;
+            "S_sep_2" := 0;
+            "S_Sep_1" := 1;
+            #Step := 3;
+            
+        END_IF;
+        IF "TimerOff" AND "S_Red_WP_sensor" THEN
+            "S_WP_stopper" := 1;
+            "TimerOn" := 0;
+            "S_sep_2" := 1;
+            #Step := 3;
+        END_IF;
+        IF "TimerOff" THEN
+            "S_WP_stopper" := 1;
+            "TimerOn" := 0;
+            #Step := 3;
+        END_IF;
+        
+        
+        
+        
+END_CASE;
+
+"IEC_Timer_0_DB".TON(IN:="TimerOn",
+                     PT:=T#2s,
+                     Q=> "TimerOff");
+
+
+
+
+
+
+
+
+
+
+
+
